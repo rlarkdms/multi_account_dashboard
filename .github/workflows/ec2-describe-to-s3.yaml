@@ -13,9 +13,9 @@ on:
 jobs:
   schedule-ec2-to-s3:
     strategy:
-      max-parallel: 2
+      max-parallel: 1
       matrix:
-        environment: ["OPS_TF","PERSONAL"]
+        environment: ["PERSONAL"]
     runs-on: ubuntu-22.04
     environment: ${{ matrix.environment }}
     steps:
@@ -28,6 +28,10 @@ jobs:
           aws-region: ap-northeast-2
       - name: describe-instances 
         run: |
+          year=`date +%Y`
+          month=`date +%m`
+          day=`date +%d`
+          hour=`date +%H`
           aws ec2 describe-instances --query 'Reservations[].Instances[].InstanceId' --region ap-northeast-2 > instance-id.txt
           total_instance_number=`cat instance-id.txt | wc -l | xargs`
           total_instance_number=$((total_instance_number-2))
@@ -40,7 +44,7 @@ jobs:
             str_instance_id="$str_instance_id $instance_id"
           done
           aws ec2 describe-instances --instance-ids $str_instance_id --region ap-northeast-2 > result.json
-          aws s3 cp result.json s3://${{ secrets.s3_bucket }}/result.json
+          aws s3 cp result.json s3://${{ secrets.s3_bucket }}/ec2/$year/$month/$day/$hour/result.json
   # master-ec2-to-s3:
   #   strategy:
   #     max-parallel: 2

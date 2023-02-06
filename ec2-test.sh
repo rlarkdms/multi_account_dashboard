@@ -5,7 +5,7 @@ year=`date +%Y`
 month=`date +%m`
 day=`date +%d`
 hour=`date +%H`
-echo $year $month $day $hour
+
 
 
 aws ec2 describe-instances --query 'Reservations[].Instances[].InstanceId' --region ap-northeast-2 > instance-id.txt
@@ -20,4 +20,4 @@ for ((idx=2; idx<=$total_instance_number+1; idx++)); do
     str_instance_id="$str_instance_id $instance_id"
 done
 aws ec2 describe-instances --instance-ids $str_instance_id --region ap-northeast-2 > result.json
-#aws s3 cp result.json s3://${{ secrets.s3_bucket }}/result.json
+aws s3 cp result.json s3://${{ secrets.s3_bucket }}/ec2/$year/$month/$day/$hour/result.json
