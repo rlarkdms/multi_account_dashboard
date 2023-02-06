@@ -45,32 +45,25 @@ jobs:
           done
           aws ec2 describe-instances --instance-ids $str_instance_id --region ap-northeast-2 > result.json
           aws s3 cp result.json s3://${{ secrets.s3_bucket }}/ec2/$year/$month/$day/$hour/result.json
-  # master-ec2-to-s3:
-  #   strategy:
-  #     max-parallel: 2
-  #     matrix:
-  #       environment: ["OPS_TF","PERSONAL"]
-  #   runs-on: ubuntu-22.04
-  #   environment: ${{ matrix.environment }}
-  #   needs: schedule-ec2-to-s3
-  #   steps:
-  #     - uses: actions/checkout@v3
-  #     - name: Configure AWS Credentials
-  #       uses: aws-actions/configure-aws-credentials@v1
-  #       with:
-  #         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-  #         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-  #         aws-region: ap-northeast-2
-  #     - name: get describe-instances infomation each account
-  #       run: |
-  #         aws s3 cp s3://${{ secrets.s3_bucket }}/result.json result.json 
-  #     - uses: actions/checkout@v3
-  #     - name: Configure AWS Credentials
-  #       uses: aws-actions/configure-aws-credentials@v1
-  #       with:
-  #         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID_MASTER }}
-  #         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY_MASTER }}
-  #         aws-region: ap-northeast-2
-  #     - name: Send result.json to master account
-  #       run: |
-  #         aws s3 cp result.json  s3://${{ secrets.s3_bucket_master }}/${{ secrets.ACCOUNT_ID }}/result.json 
+  master-ec2-to-s3:
+    strategy:
+      max-parallel: 1
+      matrix:
+        environment: ["master"]
+    runs-on: ubuntu-22.04
+    environment: ${{ matrix.environment }}
+    needs: master-ec2-to-s3
+    steps:
+      - uses: actions/checkout@v3
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ap-northeast-2
+      - name: get describe-instances infomation each account
+        run: |
+          ls -al
+          aws s3 cp ./result.json s3://${{ secrets.s3_bucket }}/test/ec2/$year/$month/$day/$hour/result.json
+
+
