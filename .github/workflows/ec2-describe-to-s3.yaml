@@ -4,11 +4,11 @@ permissions:
   contents: write
   pull-requests: write
 on: 
-  schedule:
-  - cron: "0 5 * * *"
-  # push:
-  #   branches:
-  #     - main
+  # schedule:
+  # - cron: "0 5 * * *"
+  push:
+    branches:
+      - main
 
 jobs:
   schedule-ec2-to-s3:
@@ -43,44 +43,61 @@ jobs:
             instance_id=${instance_id:0:19}
             str_instance_id="$str_instance_id $instance_id"
           done
-          mkdir -p data
-          aws ec2 describe-instances --instance-ids $str_instance_id --region ap-northeast-2 > data/result.json
-          ls -l ./data
-          ls -l
-          aws s3 cp ./data/result.json s3://${{ secrets.s3_bucket }}/ec2/$year/$month/$day/$hour/result.json
-      - uses: actions/upload-artifact@v3
-        with:
-          name: data
-          path: data/result.json
-  master-ec2-to-s3:
-    strategy:
-      max-parallel: 1
-      matrix:
-        environment: ["master"]
-    runs-on: ubuntu-22.04
-    environment: ${{ matrix.environment }}
-    needs: schedule-ec2-to-s3
-    steps:
-      - uses: actions/checkout@v3
+          
+          aws ec2 describe-instances --instance-ids $str_instance_id --region ap-northeast-2 > result.json
+          pwd
+          ls -al
+        # aws s3 cp ./data/result.json s3://${{ secrets.s3_bucket }}/ec2/$year/$month/$day/$hour/result.json
 
-      - uses: actions/download-artifact@v3
-        with:
-          name: data
-
-      - name: Configure AWS Credentials
+      - name: Configure AWS Credentials - master
         uses: aws-actions/configure-aws-credentials@v1
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-access-key-id: ${{ secrets.MASTER_AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.MASTER_AWS_SECRET_ACCESS_KEY }}
           aws-region: ap-northeast-2
-      - name: get describe-instances infomation each account
+      - name: describe-instances 
         run: |
           year=`date +%Y`
           month=`date +%m`
           day=`date +%d`
           hour=`date +%H`
-          ls -l
-          aws s3 cp ./result.json s3://${{ secrets.s3_bucket }}/test/ec2/$year/$month/$day/$hour/result.json
+          pwd
+          ls -al
+          aws s3 cp ./result.json s3://${{ secrets.s3_bucket }}/${{ secrets.SERVICE_NAME }}/ec2/${{ secrets.ACCOUNT_ID }}/$year/$month/$day/$hour/result.json
+          
+      # - uses: actions/upload-artifact@v3
+      #   with:
+      #     name: data
+      #     path: data/result.json
+  # master-ec2-to-s3:
+  #   strategy:
+  #     max-parallel: 1
+  #     matrix:
+  #       environment: ["PERSONAL"]
+  #   runs-on: ubuntu-22.04
+  #   environment: ${{ matrix.environment }}
+  #   needs: schedule-ec2-to-s3
+  #   steps:
+  #     - uses: actions/checkout@v3
+
+  #     # - uses: actions/download-artifact@v3
+  #     #   with:
+  #     #     name: data
+  #     - name: Configure AWS Credentials
+  #       uses: aws-actions/configure-aws-credentials@v1
+  #       with:
+  #         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  #         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  #         aws-region: ap-northeast-2
+      
+  #     - name: get describe-instances infomation each account
+  #       run: |
+  #         year=`date +%Y`
+  #         month=`date +%m`
+  #         day=`date +%d`
+  #         hour=`date +%H`
+  #         ls -l
+  #         aws s3 cp s3://${{ secrets.s3_bucket }}/ec2/$year/$month/$day/$hour/result.json result.json 
         
 
 
