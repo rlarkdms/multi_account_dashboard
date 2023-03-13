@@ -1,2 +1,3 @@
 *.txt
 *.json
+docker/cronjob_eks.py

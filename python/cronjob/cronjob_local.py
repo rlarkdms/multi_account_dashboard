@@ -1,4 +1,3 @@
-from urllib import response
 import boto3
 import botocore
 import argparse
