@@ -3,7 +3,6 @@ import boto3
 import botocore
 import jmespath
 import xlsxwriter
-import argparse
 import botocore.exceptions
 import datetime
 from datetime import timedelta, date
@@ -11,8 +10,6 @@ from dateutil import tz
 import time
 import logging
 import logging.handlers
-import openpyxl
-import gspread
 from google.oauth2.service_account import Credentials
 from oauth2client.service_account import ServiceAccountCredentials
 from googleapiclient.errors import HttpError
@@ -22,15 +19,16 @@ from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
-import asposecells
-import jpype
-import webbrowser
-import pyexcel
-
+import os
+from slack_sdk import WebClient
+from slack_sdk.errors import SlackApiError
+import json
 # API 토큰 파일 경로
 TOKEN_PATH = "token.json"
 # 클라이언트 시크릿 파일 경로
 CLIENT_SECRET_FILE = "client_secret.json"
+
+SLACK_BOT_TOKEN_FILE="slack_bot_token.json"
 # API 권한 범위
 SCOPES = ["https://www.googleapis.com/auth/spreadsheets", "https://www.googleapis.com/auth/drive.file"]
 
@@ -322,6 +320,19 @@ def report_ami_snapshot(ec2, account_id, xlsx, title_format, colname_format, wra
         log.error(e)
     log.info("=====Done=====")
 
+def send_slack_message(spreadsheet_url, slack_token, channel):
+    client = WebClient(token=slack_token)
+
+    try:
+        response = client.chat_postMessage(
+            channel=channel,
+            text=f"새로운 스프레드 시트가 업로드되었습니다: {spreadsheet_url}"
+        )
+        print("Slack 메시지가 전송되었습니다.")
+    except SlackApiError as e:
+        print(f"Slack 메시지를 보내는 중 에러가 발생했습니다: {e}")
+
+
 
 
 def get_credentials():
@@ -401,31 +412,20 @@ def main():
     # report_vpc(ec2, xlsx, title_format, colname_format, wrap_format, row_format, vulnerable_format) #vpc #subnet 
     log.info("=====Create EC2 Instance Report=====")
     report_instance(ec2, cloudwatch, xlsx, title_format, colname_format, wrap_format, row_format, vulnerable_format,yellow_format) #instance
-    # log.info("=====Create EBS Report=====")
-    # report_ebs(ec2, xlsx, title_format, colname_format, wrap_format, row_format, vulnerable_format) #EBS
-    # log.info("=====Create AMI & Snapshot Report=====")
-    # report_ami_snapshot(ec2, account_id, xlsx, title_format, colname_format, wrap_format, row_format, vulnerable_format) #AMI&Snapshot
-    # # log.info("=====Create Security Group Report=====")
-    # # report_sg(ec2, xlsx, title_format, colname_format, wrap_format, row_format, vulnerable_format) #security group
 
 
     xlsx.close()
      # Create a Aspose.Cells icense object
-    upload_excel_to_google_sheets(excel_file)
+    uploaded_file=upload_excel_to_google_sheets(excel_file)
 
-
-
-
-# def get_arguments():
-#     parser = argparse.ArgumentParser()
-#     parser.add_argument('-p', required=False, default='default', help='Account Credential Name')
-#     parser.add_argument('-r', required=False, default='ap-northeast-2', help='Region')
-#     args = parser.parse_args()
-#     #aws --profile kskc sts get-session-token --serial-number arn:aws:iam::072527078007:mfa/skcc-sm1940 --token-code 805533
-#     return args.r, args.p
+    if uploaded_file:
+        with open(SLACK_BOT_TOKEN_FILE, "r") as file:
+            data = json.load(file)
+        SLACK_BOT_TOKEN=data['token']
+        CHANNEL ="#superset-alert"
+        spreadsheet_url = f"https://docs.google.com/spreadsheets/d/{uploaded_file.get('id')}"
+        send_slack_message(spreadsheet_url, SLACK_BOT_TOKEN, CHANNEL)
 
 
 if __name__ == "__main__":
-    # region_args, profile_args= get_arguments()
-    # main(region_args, profile_args)
     main()
