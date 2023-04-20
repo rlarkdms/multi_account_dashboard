@@ -139,13 +139,14 @@ def report_instance(ec2, cloudwatch, xlsx, title_format, colname_format, wrap_fo
                 print(Name, Tag_cz_stage, Tag_cz_Project, Tag_cz_Owner)
                 if Name==None:
                     Name=['-']
+
+                #여기에 태그값을 넣을 수 있는 함수를 넣으면 되겠다.
                 if Tag_cz_stage==[]:
                     Tag_cz_stage=['-']
                 if Tag_cz_Project==[]:
                     Tag_cz_Project=['-']
                 if Tag_cz_Owner==[]:
                     Tag_cz_Owner=['-']
-                print(Tag_cz_stage, Tag_cz_Project, Tag_cz_Owner)
                 if State != 'terminated':
                     try:
                         Name[0]
