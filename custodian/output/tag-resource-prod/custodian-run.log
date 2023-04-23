@@ -1,0 +1,4 @@
+2023-04-23 18:14:12,296 - custodian.policy - INFO - policy:tag-resource-prod resource:aws.ec2 region:ap-northeast-2 count:0 time:0.00
+2023-04-23 18:15:00,635 - custodian.policy - INFO - policy:tag-resource-prod resource:aws.ec2 region:ap-northeast-2 count:0 time:0.00
+2023-04-23 18:17:19,552 - custodian.policy - INFO - policy:tag-resource-prod resource:aws.ec2 region:ap-northeast-2 count:0 time:0.00
+2023-04-23 18:17:38,962 - custodian.policy - INFO - policy:tag-resource-prod resource:aws.ec2 region:ap-northeast-2 count:0 time:0.00

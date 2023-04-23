@@ -1,0 +1,60 @@
+policies:
+  - name: tag-resource-dev
+    resource: aws.ec2
+    filters:
+      - type: value
+        key: "tag:Name"
+        op: regex
+        value: ".*dev.*"
+    actions:
+      - type: tag
+        key: "cz-stage"
+        value: "dev"
+
+  - name: tag-resource-qa
+    resource: aws.ec2
+    filters:
+      - type: value
+        key: "tag:Name"
+        op: regex
+        value: ".*qa.*"
+    actions:
+      - type: tag
+        key: "cz-stage"
+        value: "qa"
+
+  - name: tag-resource-stg
+    resource: aws.ec2
+    filters:
+      - type: value
+        key: "tag:Name"
+        op: regex
+        value: ".*stg.*"
+    actions:
+      - type: tag
+        key: "cz-stage"
+        value: "stg"
+
+  - name: tag-resource-prd
+    resource: aws.ec2
+    filters:
+      - type: value
+        key: "tag:Name"
+        op: regex
+        value: ".*prd.*"
+    actions:
+      - type: tag
+        key: "cz-stage"
+        value: "prd"
+
+  - name: tag-resource-prod
+    resource: aws.ec2
+    filters:
+      - type: value
+        key: "tag:Name"
+        op: regex
+        value: ".*prod.*"
+    actions:
+      - type: tag
+        key: "cz-stage"
+        value: "prod"
