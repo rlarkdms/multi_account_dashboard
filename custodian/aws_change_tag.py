@@ -1,37 +1,28 @@
+import json
 
-import re
-from c7n.actions import Action
-from c7n.registry import PluginRegistry
+# Load the tagging rules
+with open("key-value-pairs.json", "r") as f:
+    tagging_rules = json.load(f)
 
-actions = PluginRegistry('custodian.actions')
+# Create the Cloud Custodian policy with dynamic filters
+policy_template = '''
+policies:
+  - name: tag-resource-{stage}
+    resource: aws.ec2
+    filters:
+      - "tag:Name": "{stage}"
+    actions:
+      - type: tag
+        key: "cz-stage"
+        value: "{stage}"
+'''
 
-@actions.register('tag-resource')
-class TagResource(Action):
-    schema = {
-        'type': 'object',
-        'properties': {
-            'type': {'enum': ['tag-resource']}
-        }
-    }
+policies = []
+for stage in tagging_rules['stage_tags'].values():
+    policies.append(policy_template.format(stage=stage))
 
-    def process(self, resources):
-        for resource in resources:
-            name = resource['Name']
-            tags = resource.get('Tags', [])
+# Save the generated policy to a YAML file
+with open("custodian_policy.yml", "w") as f:
+    f.write(''.join(policies))
 
-            # 리소스 이름에서 cz-project, cz-service 추출
-            project_service_pattern = r'^(\w+)-(\w+)-'
-            match = re.search(project_service_pattern, name)
-
-            if match:
-                tags.append({'Key': 'cz-project', 'Value': match.group(1)})
-                tags.append({'Key': 'cz-service', 'Value': match.group(2)})
-
-            # cz-stage 추출
-            stage_pattern = r'(dev|qa|stg|prd|prod)'
-            match = re.search(stage_pattern, name)
-
-            if match:
-                tags.append({'Key': 'cz-stage', 'Value': match.group(1)})
-
-            resource['Tags'] = tags
+print("custodian_policy.yml has been generated")

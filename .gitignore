@@ -2,3 +2,4 @@
 *.json
 docker/cronjob_eks.py
 *.xlsx
+export_env_value.sh

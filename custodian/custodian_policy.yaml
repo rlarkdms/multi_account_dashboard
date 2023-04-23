@@ -58,3 +58,74 @@ policies:
       - type: tag
         key: "cz-stage"
         value: "prod"
+# policies:
+#   - name: tag-resource
+#     resource: aws.ec2
+#     filters:
+#       - type: value
+#         key: "tag:Name"
+#         op: regex
+#         value: "^.*-(dev|qa|stg|prd|prod)-.*$"
+#     actions:
+#       - type: tag
+#         key: "cz-stage"
+#         value_from:
+#           url: s3://${custodian_bucket_name}/key-value-pairs.json
+#           expr: "stage_tags[Tags[0]]"
+#           format: "json"
+#  - name: tag-resource-project
+#   resource: aws.ec2
+#   filters:
+#     - type: value
+#       key: "tag:Name"
+#       op: regex
+#       value: "^([^-]+)-([^-]+)-([^-]+)-([^-]+)$"
+#   actions:
+#     - type: tag
+#       key: "cz-project"
+#       value_from:
+#         url: "s3://your-bucket/tagging-rules.json"
+#         expr: "project_tags[Tags[0]]"
+#         format: "json"
+
+  # - name: tag-resource-service
+  #   resource: aws.ec2
+  #   filters:
+  #     - type: value
+  #       key: "tag:Name"
+  #       op: regex
+  #       value: "^([^-]+)-([^-]+)-([^-]+)-([^-]+)$"
+  #   actions:
+  #     - type: tag
+  #       key: "cz-service"
+  #       value_from:
+  #         url: "s3://your-bucket/tagging-rules.json"
+  #         expr: "service_tags[Tags[1]]"
+  #         format: "json"
+  - name: tag-resource-project
+    resource: aws.ec2
+    filters:
+      - type: value
+        key: "tag:Name"
+        op: regex
+        value: "^([^-]+)-([^-]+)-([^-]+)-([^-]+)$"
+    actions:
+      - type: tag
+        key: "cz-project"
+        value_from:
+          expr: "split('-')[0]"
+          format: "tag:Name"
+
+  - name: tag-resource-service
+    resource: aws.ec2
+    filters:
+      - type: value
+        key: "tag:Name"
+        op: regex
+        value: "^([^-]+)-([^-]+)-([^-]+)-([^-]+)$"
+    actions:
+      - type: tag
+        key: "cz-service"
+        value_from:
+          expr: "split('-')[1]"
+          format: "tag:Name"

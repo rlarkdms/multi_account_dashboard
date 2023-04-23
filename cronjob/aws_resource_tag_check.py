@@ -326,11 +326,40 @@ def send_slack_message(spreadsheet_url, slack_token, channel):
     client = WebClient(token=slack_token)
 
     try:
-        response = client.chat_postMessage(
-            channel=channel,
-            text=f"새로운 스프레드 시트가 업로드되었습니다: {spreadsheet_url}"
-        )
+        message = {
+            "channel": channel,
+            "attachments": [
+                {   
+                    "text": f"### 태그 현황 관리 \n 안녕하셔요😊 \n 금주 태그 변경 관리 부탁드립니다.🙏🏻 \n 아래링크 확인과 함께 채워지지 않은 노란 셀에 태그 값 입력 후 <b>보내기(담당자 확인🙆🏻‍♀️)</b> 혹은 <b>무시하기🙅🏻‍♀️</b> 확인 부탁드립니다. \n 태그 현황: {spreadsheet_url}",
+                    "fallback": "버튼을 사용할 수 없습니다.",
+                    "callback_id": "button_trigger",
+                    "color": "#3AA3E3",
+                    "attachment_type": "default",
+                    "actions": [
+                        {
+                            "name": "trigger_button_agree",
+                            "text": "담당자 확인⭕️",
+                            "type": "button",
+                            "value": json.dumps({"action": "trigger_agree", "param":{spreadsheet_url}})
+                        },
+                        {   "name": "trigger_button_disagree",
+                            "text": "무시하기❌",
+                            "type": "button",
+                            "value": "trigger_disagree"}
+                    ]
+                }
+            ]
+        }
+
+        response = client.chat_postMessage(**message)
         print("Slack 메시지가 전송되었습니다.")
+        return response
+
+        # response = client.chat_postMessage(
+        #     channel=channel,
+        #     text=f"새로운 스프레드 시트가 업로드되었습니다: {spreadsheet_url}"
+        # )
+        # print("Slack 메시지가 전송되었습니다.")
     except SlackApiError as e:
         print(f"Slack 메시지를 보내는 중 에러가 발생했습니다: {e}")
 

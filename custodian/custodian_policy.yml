@@ -1,0 +1,51 @@
+
+policies:
+  - name: tag-resource-dev
+    resource: aws.ec2
+    filters:
+      - "tag:Name": "dev"
+    actions:
+      - type: tag
+        key: "cz-stage"
+        value: "dev"
+
+policies:
+  - name: tag-resource-qa
+    resource: aws.ec2
+    filters:
+      - "tag:Name": "qa"
+    actions:
+      - type: tag
+        key: "cz-stage"
+        value: "qa"
+
+policies:
+  - name: tag-resource-stg
+    resource: aws.ec2
+    filters:
+      - "tag:Name": "stg"
+    actions:
+      - type: tag
+        key: "cz-stage"
+        value: "stg"
+
+policies:
+  - name: tag-resource-prd
+    resource: aws.ec2
+    filters:
+      - "tag:Name": "prd"
+    actions:
+      - type: tag
+        key: "cz-stage"
+        value: "prd"
+
+policies:
+  - name: tag-resource-prod
+    resource: aws.ec2
+    filters:
+      - "tag:Name": "prod"
+    actions:
+      - type: tag
+        key: "cz-stage"
+        value: "prod"
+

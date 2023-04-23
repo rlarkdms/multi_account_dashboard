@@ -1,0 +1,2 @@
+2023-04-23 21:25:40,470 - custodian.policy - INFO - policy:tag-resource-project resource:aws.ec2 region:ap-northeast-2 count:2 time:0.00
+2023-04-23 21:25:40,712 - custodian.policy - INFO - policy:tag-resource-project action:tag resources:2 execution_time:0.24

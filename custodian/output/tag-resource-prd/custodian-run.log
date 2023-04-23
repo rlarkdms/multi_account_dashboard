@@ -4,3 +4,5 @@
 2023-04-23 18:17:19,548 - custodian.policy - INFO - policy:tag-resource-prd action:tag resources:1 execution_time:0.29
 2023-04-23 18:17:38,712 - custodian.policy - INFO - policy:tag-resource-prd resource:aws.ec2 region:ap-northeast-2 count:1 time:0.00
 2023-04-23 18:17:38,959 - custodian.policy - INFO - policy:tag-resource-prd action:tag resources:1 execution_time:0.25
+2023-04-23 21:25:40,265 - custodian.policy - INFO - policy:tag-resource-prd resource:aws.ec2 region:ap-northeast-2 count:1 time:0.00
+2023-04-23 21:25:40,461 - custodian.policy - INFO - policy:tag-resource-prd action:tag resources:1 execution_time:0.20

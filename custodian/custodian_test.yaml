@@ -1,0 +1,21 @@
+policies:
+  - name: update-tags
+    resource: aws.ec2
+    comment: |
+      Update existing resources with the appropriate tags based on the Name tag
+    actions:
+      - type: auto-tag-user
+        update: true
+        tag: cz-stage
+        value_type: normalize
+        value: "{split('-', tag:Name)[1]}"
+      - type: auto-tag-user
+        update: true
+        tag: cz-project
+        value_type: normalize
+        value: "{split('-', tag:Name)[0]}"
+      - type: auto-tag-user
+        update: true
+        tag: cz-service
+        value_type: normalize
+        value: "{split('-', tag:Name)[2]}"
