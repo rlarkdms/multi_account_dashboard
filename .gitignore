@@ -3,3 +3,5 @@
 docker/cronjob_eks.py
 *.xlsx
 export_env_value.sh
+slack_trigger/*
+custodian/output/*
