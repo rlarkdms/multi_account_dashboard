@@ -3,5 +3,7 @@
 docker/cronjob_eks.py
 *.xlsx
 export_env_value.sh
-slack_trigger/*
-custodian/output/*
+slack_trigger/
+custodian/output/
+.github/workflows/aws_change_resource_tag.yaml
+.github/workflows/ec2-describe-to-s3.yaml
