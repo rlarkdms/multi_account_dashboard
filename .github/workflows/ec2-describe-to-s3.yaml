@@ -1,59 +1,56 @@
-name: ec2-describe-to-s3 test
-permissions:
-  id-token: write
-  contents: write
-  pull-requests: write
-on: 
-  schedule:
-  - cron: "0 5 * * *"
-  # push:
-  #   branches:
-  #     - main
+# name: ec2-describe-to-s3 test
+# permissions:
+#   id-token: write
+#   contents: write
+#   pull-requests: write
+# on: 
+#   schedule:
+#   - cron: "0 5 * * *"
 
-jobs:
-  schedule-ec2-to-s3:
-    strategy:
-      max-parallel: 1
-      matrix:
-        environment: ["PERSONAL"]
-    runs-on: ubuntu-22.04
-    environment: ${{ matrix.environment }}
-    steps:
-      - uses: actions/checkout@v3
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ap-northeast-2
-      - name: describe-instances 
-        run: |
-          year=`date +%Y`
-          month=`date +%m`
-          day=`date +%d`
-          aws ec2 describe-instances --query 'Reservations[].Instances[].InstanceId' --region ap-northeast-2 > instance-id.txt
-          total_instance_number=`cat instance-id.txt | wc -l | xargs`
-          total_instance_number=$((total_instance_number-2))
-          str_instance_id=""
+# jobs:
+#   schedule-ec2-to-s3:
+#     strategy:
+#       max-parallel: 1
+#       matrix:
+#         environment: ["PERSONAL"]
+#     runs-on: ubuntu-22.04
+#     environment: ${{ matrix.environment }}
+#     steps:
+#       - uses: actions/checkout@v3
+#       - name: Configure AWS Credentials
+#         uses: aws-actions/configure-aws-credentials@v1
+#         with:
+#           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+#           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+#           aws-region: ap-northeast-2
+#       - name: describe-instances 
+#         run: |
+#           year=`date +%Y`
+#           month=`date +%m`
+#           day=`date +%d`
+#           aws ec2 describe-instances --query 'Reservations[].Instances[].InstanceId' --region ap-northeast-2 > instance-id.txt
+#           total_instance_number=`cat instance-id.txt | wc -l | xargs`
+#           total_instance_number=$((total_instance_number-2))
+#           str_instance_id=""
 
-          for ((idx=2; idx<=$total_instance_number+1; idx++)); do
-            instance_id=`cat instance-id.txt | head -$idx | tail -1 | xargs`
-            instance_id=${instance_id:0:19}
-            str_instance_id="$str_instance_id $instance_id"
-          done
-          aws ec2 describe-instances --instance-ids $str_instance_id --region ap-northeast-2 > result.json
-      - name: Configure AWS Credentials - master
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          aws-access-key-id: ${{ secrets.MASTER_AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.MASTER_AWS_SECRET_ACCESS_KEY }}
-          aws-region: ap-northeast-2
-      - name: describe-instances 
-        run: |
-          year=`date +%Y`
-          month=`date +%m`
-          day=`date +%d`
-          aws s3 cp ./result.json s3://${{ secrets.s3_bucket }}/${{ secrets.SERVICE_NAME }}/ec2/${{ secrets.ACCOUNT_ID }}/$year/$month/$day/result.json
+#           for ((idx=2; idx<=$total_instance_number+1; idx++)); do
+#             instance_id=`cat instance-id.txt | head -$idx | tail -1 | xargs`
+#             instance_id=${instance_id:0:19}
+#             str_instance_id="$str_instance_id $instance_id"
+#           done
+#           aws ec2 describe-instances --instance-ids $str_instance_id --region ap-northeast-2 > result.json
+#       - name: Configure AWS Credentials - master
+#         uses: aws-actions/configure-aws-credentials@v1
+#         with:
+#           aws-access-key-id: ${{ secrets.MASTER_AWS_ACCESS_KEY_ID }}
+#           aws-secret-access-key: ${{ secrets.MASTER_AWS_SECRET_ACCESS_KEY }}
+#           aws-region: ap-northeast-2
+#       - name: describe-instances 
+#         run: |
+#           year=`date +%Y`
+#           month=`date +%m`
+#           day=`date +%d`
+#           aws s3 cp ./result.json s3://${{ secrets.s3_bucket }}/${{ secrets.SERVICE_NAME }}/ec2/${{ secrets.ACCOUNT_ID }}/$year/$month/$day/result.json
   
         
 

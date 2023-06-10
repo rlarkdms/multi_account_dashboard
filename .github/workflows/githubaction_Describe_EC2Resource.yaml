@@ -9,14 +9,14 @@ on:
       - main
 env:
   AWS_REGION: ap-northeast-2
-  ECR_REPOSITORY: describe_ec2_resource	
+  ECR_REPOSITORY: describe-ec2-resource	
 
 jobs:
   aws_change_resource_tag_job:
     strategy:
       max-parallel: 1
       matrix:
-        environment: ["describe_ec2_resource"]
+        environment: ["describe-ec2-resource"]
     runs-on: ubuntu-22.04
     environment: ${{ matrix.environment }}
     steps:
