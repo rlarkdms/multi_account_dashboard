@@ -7,3 +7,4 @@ slack_trigger/
 custodian/output/
 .github/workflows/aws_change_resource_tag.yaml
 .github/workflows/ec2-describe-to-s3.yaml
+temp/

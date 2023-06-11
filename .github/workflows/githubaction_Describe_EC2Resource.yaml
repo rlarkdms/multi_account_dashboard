@@ -33,16 +33,27 @@ jobs:
       - name: Login-ecr
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
-      - name: Debug file structure
-        run: ls -R
 
+      - name: Debug file structure
+        run: |
+          ls -l
+          ls -l ./Describe_Resource
+
+
+      # - name: Build and Push
+      #   id: docker_build
+      #   uses: docker/build-push-action@v1
+      #   with:
+      #     context: ./Describe_Resource
+      #     file: ./Dockerfile
+      #     platforms: linux/amd64
+      #     push: true
+      #     tags: ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:${{ github.sha }}
       - name: Build and Push
-        id: docker_build
-        uses: docker/build-push-action@v2
-        with:
-          context: .
-          file: ./Describe_Resource/Dockerfile
-          platforms: linux/amd64
-          push: true
-          tags: ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:${{ github.sha }}
+        run: |
+          ls -l
+          docker build . --file ./Describe_Resource/Dockerfile --tag ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:${{ github.sha }}
+
+      - name: Push the Docker image
+        run: docker push ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:${{ github.sha }}
 
