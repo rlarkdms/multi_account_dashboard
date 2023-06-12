@@ -5,6 +5,17 @@
 # ${PARAMETER_REGION} is Region
 # ${PARAMETER_SERVICE} i Service
 
+## ------ test -------
+
+echo ${PARAMETER_ACCOUNT}
+echo ${PARAMETER_ROLE}
+echo ${PARAMETER_REGION}
+echo ${PARAMETER_SERVICE}
+
+aws s3 ls
+
+## -------------------
+
 ROLE_ARN="arn:aws:iam::${PARAMETER_ACCOUNT}:role/${PARAMETER_ROLE}"
 SESSION_NAME=${PARAMETER_ROLE}
 REGION=${PARAMETER_REGION}
