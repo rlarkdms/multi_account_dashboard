@@ -5,16 +5,6 @@
 # ${PARAMETER_REGION} is Region
 # ${PARAMETER_SERVICE} i Service
 
-## ------ test -------
-
-echo ${PARAMETER_ACCOUNT}
-echo ${PARAMETER_ROLE}
-echo ${PARAMETER_REGION}
-echo ${PARAMETER_SERVICE}
-
-aws s3 ls
-
-## -------------------
 
 ROLE_ARN="arn:aws:iam::${PARAMETER_ACCOUNT}:role/${PARAMETER_ROLE}"
 SESSION_NAME=${PARAMETER_ROLE}
@@ -30,11 +20,14 @@ export AWS_SESSION_TOKEN=$(echo $CREDENTIALS | jq -r .Credentials.SessionToken)
 
 # AWS CLI 명령을 이 새로운 자격 증명으로 실행
 # 예를 들면, S3 버킷의 리스트를 가져오는 명령을 실행할 수 있습니다.
-aws ec2 describe-instances --query 'Reservations[*].Instances[*]' --output json > instances.json
+aws ec2 describe-instances \
+  --query 'Reservations[*].Instances[*].{ImageId:ImageId, InstanceId:InstanceId, InstanceType:InstanceType}' \
+  --output json > output.json
 
-jq -c '.[]' instances.json > instances_line.json
+jq -c '.[]' output.json | cut -c 2- | rev | cut -c 2- | rev > instances.json
 
-# 액세스 키 취소
+
+#액세스 키 취소
 unset AWS_ACCESS_KEY_ID
 unset AWS_SECRET_ACCESS_KEY
 unset AWS_SESSION_TOKEN
@@ -46,5 +39,5 @@ hours=$(date +%H)
 minutes=$(date +%M)
 seconds=$(date +%S)
 
-aws s3 cp instances_line.json s3://mad-master-bucket/${PARAMETER_SERVICE}/${PARAMETER_ACCOUNT}/ec2/${year}/${month}/${day}/${hours}/AWS_Info_${minutes}.json
-rm instances.json instances_line.json
+aws s3 cp instances.json s3://mad-master-bucket/${PARAMETER_SERVICE}/account=${PARAMETER_ACCOUNT}/service=ec2/year=${year}/month=${month}/day=${day}/hours=${hours}/AWS_Info_${minutes}.json
+rm output.json instances.json
