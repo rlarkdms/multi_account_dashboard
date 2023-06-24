@@ -39,5 +39,5 @@ hours=$(date +%H)
 minutes=$(date +%M)
 seconds=$(date +%S)
 
-aws s3 cp instances.json s3://mad-master-bucket/${PARAMETER_SERVICE}/account=${PARAMETER_ACCOUNT}/service=ec2/year=${year}/month=${month}/day=${day}/hours=${hours}/AWS_Info_${minutes}.json
+aws s3 cp instances.json s3://mad-master-bucket/${PARAMETER_SERVICE}/account=${PARAMETER_ACCOUNT}/service=ec2/year=${year}/month=${month}/day=${day}/hours=${hours}/AWS_Info.json
 rm output.json instances.json
